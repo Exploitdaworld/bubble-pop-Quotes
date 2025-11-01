@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bubble Quotes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+
+    body {
+      overflow: hidden;
+      background: linear-gradient(to bottom right, #bdcacf, #ff93a5);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .title-wrapper {
+      margin-bottom: 2rem;
+      text-align: center;
+      animation: floatTitle 3s ease-in-out infinite;
+    }
+
+    .main-title {
+      font-family: 'Righteous', cursive;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 3.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+
+    .title-emoji {
+      display: inline-block;
+      animation: bounce 2s ease infinite;
+      margin-left: 0.5rem;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+    }
+
+    @keyframes floatTitle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      50% { transform: translateY(-15px) rotate(10deg); }
+    }
+
+    @keyframes stickyAppear {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -30%) rotate(-8deg) scale(0.8);
+      }
+      50% {
+        transform: translate(-50%, -55%) rotate(4deg) scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(-2deg) scale(1);
+      }
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, 
+        rgba(255,255,255,0.9) 0%,
+        rgba(255,255,255,0.6) 20%,
+        rgba(147,197,253,0.4) 50%,
+        rgba(147,197,253,0.2) 80%
+      );
+      box-shadow: 
+        inset -5px -5px 15px rgba(255,255,255,0.4),
+        inset 5px 5px 15px rgba(147,197,253,0.4),
+        0 0 20px rgba(147,197,253,0.3);
+      opacity: 0.85;
+      cursor: pointer;
+      animation: float 6s ease-in-out infinite;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+
+    .bubble::after {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 15%;
+      width: 30%;
+      height: 30%;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+
+    @keyframes float {
+      0%, 100% { 
+        transform: translate(0, 0) scale(1); 
+      }
+      25% { 
+        transform: translate(8px, -10px) scale(1.02); 
+      }
+      50% { 
+        transform: translate(-4px, 8px) scale(0.98); 
+      }
+      75% { 
+        transform: translate(-8px, -4px) scale(1.01); 
+      }
+    }
+
+    .quote-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-2deg);
+      background: #fef3c7;
+      padding: 2rem;
+      text-align: center;
+      z-index: 50;
+      display: none;
+      max-width: 320px;
+      min-height: 200px;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 23px, #e5e7eb 24px);
+      box-shadow: 
+        0 5px 10px rgba(0,0,0,0.1),
+        0 0 0 1px rgba(255,200,0,0.1);
+      clip-path: polygon(
+        0% 0%, 100% 0%, 100% calc(100% - 20px), 
+        calc(100% - 20px) 100%, 0% 100%
+      );
+    }
+
+    .quote-box::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 24px;
+      background: #ef4444;
+      border-radius: 50%;
+      box-shadow: 
+        inset -2px -2px 5px rgba(0,0,0,0.2),
+        0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .quote-box::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+    }
+
+    .restart-button {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3b82f6;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .restart-button.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .restart-button:hover {
+      background: #e7aa39;
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="title-wrapper">
+    <h1 class="main-title">
+      POP THE MAGICAL BUBBLES
+    </h1>
+    <p class="text-lg text-blue-600 mt-2 font-medium" style="text-shadow: 0 1px 2px rgba(0,0,0,0.1)">
+      Each bubble holds a secret inspiration just for you! 
+    </p>
+  </div>
+
+  <div id="bubbleContainer" class="relative w-full h-[80vh] flex items-center justify-center"></div>
+
+    <div id="quoteBox" class="quote-box">
+      <p id="quoteText" class="text-xl font-handwriting text-gray-800 mb-6" style="font-family: 'Comic Sans MS', cursive;"></p>
+      <button id="closeQuote" class="mt-4 bg-transparent hover:bg-amber-100 text-gray-700 px-4 py-2 rounded border border-amber-200 transition-colors duration-200">
+        ✕ Close
+      </button>
+    </div>  <script>
+    const quotes = [
+      "Discipline is choosing what you want most over what you want now.",
+      "The secret to getting ahead is getting started.",
+      "Every day is a new opportunity to grow.",
+      "Be so good they can’t ignore you.",
+      "Focus on progress, not perfection.",
+      "Small steps lead to big change.",
+      "Don’t wish for it. Work for it.",
+      "You are stronger than your excuses.",
+      "Doubt kills more dreams than failure ever will.",
+      "Stay consistent — that’s where success hides.",
+      "Your only limit is your mind.",
+      "Courage doesn’t mean you don’t get afraid — it means you don’t let fear stop you.",
+      "Discomfort is the sign of growth.",
+      "Make your future self proud.",
+      "A little progress each day adds up to big results."
+    ];
+
+    const bubbleContainer = document.getElementById('bubbleContainer');
+    const quoteBox = document.getElementById('quoteBox');
+    const quoteText = document.getElementById('quoteText');
+    const closeQuote = document.getElementById('closeQuote');
+    const restartButton = document.createElement('button');
+    restartButton.id = 'restartButton';
+    restartButton.className = 'restart-button';
+    restartButton.textContent = '✨ Let\'s Go Again!';
+    document.body.appendChild(restartButton);
+
+    let remainingBubbles = 0;
+
+    function initGame() {
+      // Hide restart button and quote box
+      restartButton.classList.remove('visible');
+      quoteBox.style.display = 'none';
+      
+      // Clear existing bubbles
+      bubbleContainer.innerHTML = '';
+      
+      // Create new bubbles
+      const bubbleCount = Math.floor(Math.random() * 6) + 9; // between 9 and 15
+      remainingBubbles = bubbleCount;
+      
+      for (let i = 0; i < bubbleCount; i++) {
+        createBubble(i);
+      }
+    }
+
+    // Initial game setup
+    initGame();
+
+    function createBubble(index) {
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      const size = Math.random() * 40 + 40; // Slightly smaller bubbles
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+      
+      // Constrain the bubbles to a more central area
+      const containerWidth = window.innerWidth * 0.8; // Use only 80% of the screen width
+      const containerHeight = window.innerHeight * 0.6; // Use only 60% of the screen height
+      const marginX = (window.innerWidth - containerWidth) / 2;
+      const marginY = (window.innerHeight - containerHeight) / 2;
+      
+      // Random starting position within the constrained area
+      const startX = marginX + Math.random() * containerWidth;
+      const startY = marginY + Math.random() * containerHeight;
+      bubble.style.left = `${startX}px`;
+      bubble.style.top = `${startY}px`;
+      
+      // Random animation delay and duration
+      const delay = Math.random() * 3;
+      const duration = 4 + Math.random() * 2;
+      bubble.style.animationDelay = `-${delay}s`;
+      bubble.style.animationDuration = `${duration}s`;
+
+      bubbleContainer.appendChild(bubble);
+
+      bubble.addEventListener('click', () => popBubble(bubble, index));
+    }
+
+    function popBubble(bubble, index) {
+      bubble.style.transform = "scale(0)";
+      bubble.style.opacity = "0";
+      setTimeout(() => bubble.remove(), 300);
+
+      const quote = quotes[index % quotes.length];
+      quoteText.textContent = quote;
+      quoteBox.style.display = 'block';
+      quoteBox.style.animation = 'stickyAppear 0.6s ease-out forwards';
+
+      remainingBubbles--;
+      if (remainingBubbles === 0) {
+        setTimeout(() => {
+          restartButton.classList.add('visible');
+        }, 1000);
+      }
+    }
+
+    closeQuote.addEventListener('click', () => {
+      quoteBox.style.opacity = '0';
+      quoteBox.style.transform = 'translate(-50%, -30%) rotate(-8deg) scale(0.8)';
+      quoteBox.style.transition = 'all 0.3s ease-in';
+      setTimeout(() => {
+        quoteBox.style.display = 'none';
+        quoteBox.style.opacity = '';
+        quoteBox.style.transform = '';
+        quoteBox.style.transition = '';
+      }, 300);
+    });
+
+    // Add restart button click handler
+    restartButton.addEventListener('click', () => {
+      initGame();
+    });
+  </script>
+
+</body>
+</html>
